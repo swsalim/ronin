@@ -34,7 +34,8 @@ export default function HomePage() {
       </h1>
 
       <p className="mx-auto mt-12 max-w-xl text-lg text-slate-400 leading-7">
-        Are you worried about falling victim to scams and fraud online?{' '}
+        Are you worried about falling victim to scams and fraud online?
+        <br />
         <span className="font-medium">Ronin</span> analyzes your text in real-time and detects any
         signs of a scam.
       </p>
