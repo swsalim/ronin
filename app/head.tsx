@@ -5,11 +5,11 @@ const seo = {
   titleSuffix: '| Ronin',
   finalTitle: '',
   description:
-    'ScamChecker detects scams in emails, messages, and chats. Protect yourself from scams with ScamCheck - the ultimate solution to stay safe online.Need medical assistance? Find the best health care providers in your Singapore and check out its opening hours and location!',
+    'Ronin detects scams in emails, messages, and chats. Protect yourself from scams with Ronin - the ultimate solution to stay safe online.',
   url: `${process.env.NEXT_PUBLIC_BASE_URL}`,
   og: {
     image: absoluteUrl('/og-default.png'),
-    imageAlt: 'Banner for ScamChecker.com',
+    imageAlt: 'Banner for Ronin',
     width: '1200',
     height: '630',
   },
