@@ -15,11 +15,12 @@ import ResizablePanel from '@/components/ResizablePanel';
 export default function MessageBox() {
   const resultRef = useRef(null);
 
-  const defaultValues = { summary: '', result: false, value: 0, list: [] };
+  const defaultValues = { summary: '', result: false, error: false, list: [] };
 
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [showError, setShowError] = useState(false);
   const [checkedMessage, setCheckedMessage] = useState(defaultValues);
 
   const prompt = `I want you to act as a cyber security expert. Given the content below, create a JSON object with properties named "summary", "result", "value" and "explanations".
@@ -51,6 +52,7 @@ export default function MessageBox() {
     e.preventDefault();
     setCheckedMessage(defaultValues);
     setShowResult(false);
+    setShowError(false);
     setLoading(true);
 
     const response = await fetch('/api/check', {
@@ -63,44 +65,21 @@ export default function MessageBox() {
       }),
     });
 
+    console.log('response');
+    console.log(response);
+
     if (!response.ok) {
+      setShowError(true);
+      setLoading(false);
       throw new Error(response.statusText);
     }
 
-    // const data = response.body;
-    // if (!data) {
-    //   return;
-    // }
-
-    // TODO: improve with ReadableStream
-    // const reader = data.getReader();
-    // const decoder = new TextDecoder();
-    // let done = false;
-
-    // while (!done) {
-    //   const { value, done: doneReading } = await reader.read();
-    //   done = doneReading;
-    //   const chunkValue = decoder.decode(value);
-    //   setCheckedMessage((prev) => prev + chunkValue);
-    // }
-
     const answer = await response.json();
+    console.log('answer');
+    console.log(answer);
+
     setCheckedMessage(JSON.parse(answer));
-
-    // const answer = {
-    //   summary: 'Ad sint aute veniam id laboris fugiat ea dolor cupidatat.',
-    //   result: true,
-    //   value: 0,
-    //   list: [],
-    // };
-
     setShowResult(true);
-
-    // TODO: fixed scrolling
-    // if (resultRef.current instanceof HTMLElement) {
-    //   resultRef.current.scrollIntoView({ behavior: 'smooth' });
-    // }
-
     setLoading(false);
   };
 
@@ -130,7 +109,14 @@ Now for you to claim your Donation funds forward the details below to me via thi
         </Button>
       )}
 
-      {showResult && (
+      {showError && (
+        <div className="bg-red-50 text-red-700 px-4 py-4 mb-4 mt-8 max-w-lg block mx-auto border-solid border-red-700 rounded-md border-[1px]">
+          <h2 className="font-medium">Error!</h2>
+          <p>Too many checks in 1 day. Please try again in 24 hours.</p>
+        </div>
+      )}
+
+      {showResult && !checkedMessage.error && (
         <ResizablePanel>
           <AnimatePresence mode="wait">
             <motion.div className="space-y-10 my-16">
@@ -141,10 +127,10 @@ Now for you to claim your Donation funds forward the details below to me via thi
                 animate="show"
                 viewport={{ once: true }}
                 variants={container}
-                className="grid grid-cols-4 gap-4">
+                className="grid grid-cols-3 md:grid-cols-4 gap-4">
                 <motion.div
                   variants={FADE_DOWN_ANIMATION_VARIANTS}
-                  className="relative w-48 h-48 mt-8 mx-auto col-start-4 col-span-1 row-start-1">
+                  className="relative w-48 h-48 mt-8 mx-auto col-start-4 col-span-1 row-start-1 hidden md:block">
                   <Image
                     src="/mascot-samurai-transparent.png"
                     alt="Ronin Mascot"

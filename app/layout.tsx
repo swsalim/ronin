@@ -1,6 +1,10 @@
 import '@/styles/global.css';
-import { cn } from '@/lib/utils';
+
 import localFont from '@next/font/local';
+
+import { cn } from '@/lib/utils';
+
+import { AnalyticsWrapper } from '@/components/Analytics';
 
 const myFont = localFont({
   src: [
@@ -66,8 +70,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
-      className={cn('bg-slate-900 font-sans text-slate-100 antialiased', myFont.variable)}
-    >
+      className={cn('bg-slate-900 font-sans text-slate-100 antialiased', myFont.variable)}>
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
@@ -75,7 +78,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="icon" href="/icons/favicon.ico" />
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        {children}
+        <AnalyticsWrapper />
+      </body>
     </html>
   );
 }

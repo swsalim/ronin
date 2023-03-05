@@ -1,10 +1,37 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+import { Ratelimit } from '@upstash/ratelimit';
+import requestIp from 'request-ip';
+
+import redis from '@/lib/redis';
+
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing env var from OpenAI');
 }
 
+// Create a new ratelimiter, that allows 5 requests per 24 hours
+const ratelimit = redis
+  ? new Ratelimit({
+      redis: redis,
+      limiter: Ratelimit.fixedWindow(5, '1440 m'),
+      analytics: true,
+    })
+  : undefined;
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Rate Limiter Code
+  if (ratelimit) {
+    const identifier = requestIp.getClientIp(req);
+    const result = await ratelimit.limit(identifier!);
+    res.setHeader('X-RateLimit-Limit', result.limit);
+    res.setHeader('X-RateLimit-Remaining', result.remaining);
+
+    if (!result.success) {
+      res.status(429).json({ error: 'Too many checks in 1 day. Please try again in 24 hours.' });
+      return;
+    }
+  }
+
   const { prompt } = req.body;
 
   if (!prompt) {
@@ -13,6 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const payload = {
     model: 'text-davinci-003',
+    // model: 'gpt-3.5-turbo',
     prompt,
     temperature: 0.7,
     top_p: 1,
